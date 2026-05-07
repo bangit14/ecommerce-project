@@ -1,0 +1,21 @@
+# ENV
+.env
+.env.*
+
+# YAML
+*.yml
+*.yaml
+
+# Spring Boot
+target/
+
+# React
+node_modules/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
