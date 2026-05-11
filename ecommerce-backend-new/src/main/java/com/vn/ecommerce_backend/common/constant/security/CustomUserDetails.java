@@ -22,8 +22,8 @@ public class CustomUserDetails implements UserDetails {
     private String phone;
     private LocalDate dateOfBirth;
     private String password;
-    private boolean active = true;
-    private boolean emailVerified = false;
+    private boolean active;
+    private boolean emailVerified;
     private LocalDateTime createdAt;
 
     private List<String> roles;        // ["ADMIN", "STAFF"]

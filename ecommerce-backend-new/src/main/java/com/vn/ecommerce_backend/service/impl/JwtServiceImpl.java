@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 
@@ -39,6 +40,10 @@ public class JwtServiceImpl implements JwtService {
     private static final String USER_ID_CLAIM = "userId";
     private static final String FULL_NAME_CLAIM = "fullName";
     private static final String EMAIL_CLAIM = "email";
+    private static final String PHONE_CLAIM = "phone";
+    private static final String DOB_CLAIM = "dob";
+    private static final String ENABLED_CLAIM = "enabled";
+    private static final String EMAIL_VERIFIED_CLAIM = "emailVerified";
     private static final String ROLES_CLAIM = "roles";
     private static final String TOKEN_TYPE_CLAIM = "typ";
     private static final String PERMISSIONS_CLAIM = "permissions";

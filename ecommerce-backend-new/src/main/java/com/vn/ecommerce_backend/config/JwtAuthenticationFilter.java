@@ -76,26 +76,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.debug("JWT error: {}", ex.getMessage());
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
             return;
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            try {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if (jwtService.isTokenValid(jwt, TokenType.ACCESS_TOKEN, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            } catch (UsernameNotFoundException e) {
-                log.warn("User not found for JWT: {}", username);
-            }
+        } catch (Exception ex) {
+            log.error("Unexpected error in JWT filter", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
         }
 
         filterChain.doFilter(request, response);

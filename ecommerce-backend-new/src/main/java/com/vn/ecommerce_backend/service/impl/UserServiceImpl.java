@@ -68,7 +68,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailResponse getCurrentUser() {
-
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
@@ -77,17 +76,12 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        if (authentication.getPrincipal() instanceof CustomUserDetails customUser) {
-            return mapToUserDetailResponse(customUser);
-        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        log.warn("JWT principal is not CustomUserDetails, falling back to database for user: {}",
-                authentication.getName());
-
-        User user = userRepository.findUserWithRolesAndPermissionsByUsername(authentication.getName())
+        User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return mapToUserDetailResponse(user);
+        return mapToUserDetailResponse(user,userDetails.getRoles(), userDetails.getPermissions());
     }
 
     @Override
@@ -238,6 +232,22 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    private UserDetailResponse mapToUserDetailResponse(User user, List<String> roles, List<String> permissions) {
+        return UserDetailResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .dateOfBirth(user.getDateOfBirth())
+                .isActive(user.isActive())
+                .isEmailVerified(user.isEmailVerified())
+                .createdAt(user.getCreatedAt())
+                .roles(roles)
+                .permissions(permissions)
+                .build();
+    }
+
     private List<String> getPermissionsFromUser(User user) {
         return user.getRoles().stream()
                 .map(UserHasRole::getRole)
@@ -245,17 +255,6 @@ public class UserServiceImpl implements UserService {
                 .map(rhp -> rhp.getPermission().getName())
                 .distinct()
                 .toList();
-    }
-
-    private UserDetailResponse mapToUserDetailResponse(CustomUserDetails userDetails) {
-        return UserDetailResponse.builder()
-                .id(userDetails.getId())
-                .username(userDetails.getUsername())
-                .email(userDetails.getEmail())
-                .fullName(userDetails.getFullName())
-                .roles(userDetails.getRoles())
-                .permissions(userDetails.getPermissions())
-                .build();
     }
 
     public static <T> PageResponse<T> convertToPageResponse(Page<T> page) {
